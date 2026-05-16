@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كويز الدرس الأول — الصليب خطة أزلية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #4FC3F7;
+    --sky-dark: #0288D1;
+    --green: #81C784;
+    --green-dark: #388E3C;
+    --yellow: #FFD54F;
+    --yellow-dark: #F9A825;
+    --orange: #FFB74D;
+    --purple: #CE93D8;
+    --red: #EF5350;
+    --red-light: #FFEBEE;
+    --correct: #66BB6A;
+    --correct-light: #E8F5E9;
+    --white: #FFFFFF;
+    --bg: #F0F8FF;
+    --card: #FFFFFF;
+    --text: #1A237E;
+    --text-light: #5C6BC0;
+    --radius: 20px;
+    --shadow: 0 8px 32px rgba(2,136,209,0.13);
+    --shadow-hover: 0 16px 48px rgba(2,136,209,0.22);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    direction: rtl;
+    overflow-x: hidden;
+  }
+
+  /* ===== ANIMATED BACKGROUND ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(79,195,247,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 85% 80%, rgba(129,199,132,0.18) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255,213,79,0.10) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 40px;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    width: 100%;
+    max-width: 720px;
+    text-align: center;
+    margin-bottom: 28px;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--sky-dark), #1565C0);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 50px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 14px rgba(2,136,209,0.3);
+  }
+
+  .site-header h1 {
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1.3;
+  }
+
+  .site-header h1 span {
+    background: linear-gradient(135deg, var(--sky-dark), #7B1FA2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-cross {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 6px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* ===== SCREEN BASE ===== */
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 720px;
+    animation: fadeUp 0.5s ease both;
+  }
+  .screen.active { display: block; }
+
+  /* ===== WELCOME SCREEN ===== */
+  .welcome-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 40px 32px;
+    text-align: center;
+    border: 3px solid rgba(79,195,247,0.3);
+  }
+
+  .welcome-icon {
+    font-size: 70px;
+    display: block;
+    margin-bottom: 16px;
+    animation: bounce 1.5s ease-in-out infinite;
+  }
+
+  .welcome-card h2 {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .welcome-card p {
+    font-size: 16px;
+    color: var(--text-light);
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+
+  .input-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+    margin-bottom: 10px;
+    text-align: right;
+  }
+
+  .name-input {
+    width: 100%;
+    padding: 16px 20px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 17px;
+    border: 2.5px solid rgba(79,195,247,0.4);
+    border-radius: 14px;
+    outline: none;
+    color: var(--text);
+    background: #F8FBFF;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    margin-bottom: 22px;
+    text-align: right;
+    direction: rtl;
+  }
+  .name-input:focus {
+    border-color: var(--sky-dark);
+    box-shadow: 0 0 0 4px rgba(79,195,247,0.2);
+  }
+  .name-input::placeholder { color: #B0BEC5; }
+
+  .info-box {
+    background: linear-gradient(135deg, #E3F2FD, #F3E5F5);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    text-align: right;
+    flex-wrap: wrap;
+  }
+  .info-box .info-item {
+    flex: 1;
+    min-width: 120px;
+  }
+  .info-box .info-num {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--sky-dark);
+    display: block;
+  }
+  .info-box .info-lbl {
+    font-size: 13px;
+    color: var(--text-light);
+    font-weight: 600;
+  }
+
+  /* ===== BUTTONS ===== */
+  .btn-start {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--sky-dark), #1565C0);
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 24px rgba(2,136,209,0.4);
+    letter-spacing: 0.5px;
+  }
+  .btn-start:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 32px rgba(2,136,209,0.5);
+  }
+  .btn-start:active { transform: translateY(0); }
+
+  /* ===== QUIZ SCREEN ===== */
+  .quiz-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .q-counter {
+    background: white;
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  .q-counter span {
+    color: var(--sky-dark);
+    font-size: 18px;
+  }
+
+  .progress-wrap {
+    flex: 1;
+    min-width: 160px;
+    background: #E3F2FD;
+    border-radius: 50px;
+    height: 12px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sky), var(--sky-dark));
+    border-radius: 50px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .score-badge {
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    color: white;
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 2px 12px rgba(56,142,60,0.3);
+  }
+
+  /* ===== QUESTION CARD ===== */
+  .question-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 32px;
+    margin-bottom: 18px;
+    border: 2.5px solid rgba(79,195,247,0.2);
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .q-type-tag {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .tag-tf { background: #E8F5E9; color: var(--green-dark); }
+  .tag-mc { background: #E3F2FD; color: var(--sky-dark); }
+
+  .question-text {
+    font-size: clamp(17px, 3.5vw, 21px);
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .question-text .verse {
+    display: block;
+    background: linear-gradient(135deg, #FFF8E1, #FFF3E0);
+    border-right: 4px solid var(--yellow-dark);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-top: 10px;
+    font-size: 18px;
+    font-style: italic;
+    color: #5D4037;
+  }
+
+  /* ===== CHOICES ===== */
+  .choices-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .choice-btn {
+    width: 100%;
+    padding: 16px 20px;
+    background: #F8FBFF;
+    border: 2.5px solid #E3F2FD;
+    border-radius: 14px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    text-align: right;
+    direction: rtl;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .choice-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--sky), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--sky);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79,195,247,0.25);
+  }
+  .choice-btn:hover:not(:disabled)::before { opacity: 0.08; }
+
+  .choice-btn .choice-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #E3F2FD;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--sky-dark);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .choice-btn.correct {
+    background: var(--correct-light);
+    border-color: var(--correct);
+    animation: correctPop 0.4s ease;
+  }
+  .choice-btn.correct .choice-icon {
+    background: var(--correct);
+    color: white;
+  }
+
+  .choice-btn.wrong {
+    background: var(--red-light);
+    border-color: var(--red);
+    animation: shake 0.4s ease;
+  }
+  .choice-btn.wrong .choice-icon {
+    background: var(--red);
+    color: white;
+  }
+
+  .choice-btn:disabled { cursor: default; }
+
+  /* TF specific */
+  .tf-btn { justify-content: center; font-size: 18px; padding: 20px; }
+  .tf-btn .tf-emoji { font-size: 28px; }
+
+  /* ===== FEEDBACK ===== */
+  .feedback-box {
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    display: none;
+    align-items: flex-start;
+    gap: 12px;
+    animation: fadeUp 0.35s ease;
+  }
+  .feedback-box.show { display: flex; }
+  .feedback-box.correct-fb { background: var(--correct-light); border: 2px solid var(--correct); }
+  .feedback-box.wrong-fb { background: var(--red-light); border: 2px solid var(--red); }
+  .feedback-icon { font-size: 28px; flex-shrink: 0; }
+  .feedback-text { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.6; }
+  .feedback-text .correct-answer { color: var(--green-dark); }
+
+  /* ===== NEXT BUTTON ===== */
+  .btn-next {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--yellow-dark), var(--orange));
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    display: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 20px rgba(249,168,37,0.4);
+    margin-top: 16px;
+  }
+  .btn-next.show { display: block; animation: fadeUp 0.3s ease both; }
+  .btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(249,168,37,0.5); }
+
+  /* ===== RESULT SCREEN ===== */
+  .result-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 3px solid rgba(255,213,79,0.5);
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,213,79,0.2), transparent 70%);
+    border-radius: 50%;
+  }
+
+  .result-trophy { font-size: 80px; display: block; margin-bottom: 12px; animation: trophyBounce 0.8s ease both; }
+
+  .result-name {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .result-name span { color: var(--sky-dark); }
+
+  .score-circle {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    margin: 24px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .score-circle svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  .score-circle svg circle {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+  }
+
+  .score-circle svg .bg-circle { stroke: #E3F2FD; }
+  .score-circle svg .progress-circle {
+    stroke: var(--sky-dark);
+    stroke-dasharray: 440;
+    stroke-dashoffset: 440;
+    transition: stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1) 0.3s;
+  }
+
+  .score-number {
+    font-size: 42px;
+    font-weight: 900;
+    color: var(--text);
+    position: relative;
+    z-index: 1;
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-light);
+    position: relative;
+    z-index: 1;
+  }
+
+  .result-message {
+    font-size: 20px;
+    font-weight: 900;
+    padding: 14px 24px;
+    border-radius: 50px;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .result-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-box {
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .stat-box.correct-stat { background: var(--correct-light); border: 2px solid var(--correct); }
+  .stat-box.wrong-stat { background: var(--red-light); border: 2px solid var(--red); }
+  .stat-box .stat-num { font-size: 32px; font-weight: 900; display: block; }
+  .stat-box .stat-lbl { font-size: 13px; font-weight: 700; }
+  .stat-box.correct-stat .stat-num { color: var(--green-dark); }
+  .stat-box.wrong-stat .stat-num { color: var(--red); }
+
+  .btn-retry {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--sky-dark), #1565C0);
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 6px 24px rgba(2,136,209,0.4);
+  }
+  .btn-retry:hover { transform: translateY(-3px); }
+
+  /* ===== POPUP ===== */
+  .popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .popup-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+
+  .popup-box {
+    background: white;
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+    animation: popupIn 0.4s cubic-bezier(.175,.885,.32,1.275) both;
+  }
+
+  .popup-emoji { font-size: 72px; display: block; margin-bottom: 16px; }
+  .popup-title { font-size: 26px; font-weight: 900; color: var(--text); margin-bottom: 10px; }
+  .popup-msg { font-size: 16px; color: var(--text-light); line-height: 1.6; margin-bottom: 24px; }
+
+  .btn-popup-close {
+    padding: 14px 40px;
+    background: linear-gradient(135deg, var(--green), var(--green-dark));
+    color: white;
+    font-family: 'Cairo', sans-serif;
+    font-size: 17px;
+    font-weight: 900;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(56,142,60,0.4);
+    transition: transform 0.2s;
+  }
+  .btn-popup-close:hover { transform: scale(1.05); }
+
+  /* ===== CONFETTI ===== */
+  .confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999;
+    overflow: hidden;
+  }
+
+  .confetti-piece {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: -20px;
+    border-radius: 3px;
+    animation: confettiFall linear forwards;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+
+  @keyframes correctPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes trophyBounce {
+    0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+    60% { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+
+  @keyframes popupIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes confettiFall {
+    0% { top: -20px; opacity: 1; }
+    80% { opacity: 1; }
+    100% { top: 110vh; opacity: 0; }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 480px) {
+    .question-card { padding: 22px 18px; }
+    .result-card { padding: 28px 20px; }
+    .tf-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup-box">
+    <span class="popup-emoji">🎉</span>
+    <div class="popup-title">رائع يا بطل! 🏆</div>
+    <div class="popup-msg" id="popupMsg">درجتك اتسجلت بنجاح يا بطل! أنت نجم الكويز! ⭐</div>
+    <button class="btn-popup-close" onclick="closePopup()">تمام، شكراً! 😊</button>
+  </div>
+</div>
+
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <div class="site-header">
+    <span class="header-cross">✝️</span>
+    <div class="header-badge">مهرجان الكرازة المرقسية ٢٠٢٦ — ثالثة ورابعة ابتدائي</div>
+    <h1>الدرس الأول<br><span>الصليب خطة أزلية</span></h1>
+  </div>
+
+  <!-- ===== SCREEN 1: WELCOME ===== -->
+  <div class="screen active" id="screenWelcome">
+    <div class="welcome-card">
+      <span class="welcome-icon">👋</span>
+      <h2>أهلاً بك في كويز الدرس الأول!</h2>
+      <p>اكتب اسمك الكامل وابدأ الكويز 🎯<br>عاوزك تركز وتجاوب بشجاعة!</p>
+
+      <label class="input-label">✏️ اسمك بالكامل:</label>
+      <input type="text" class="name-input" id="studentName" placeholder="اكتب اسمك هنا..." />
+
+      <div class="info-box">
+        <div class="info-item">
+          <span class="info-num">16</span>
+          <span class="info-lbl">سؤال</span>
+        </div>
+        <div class="info-item">
+          <span class="info-num">✅❌</span>
+          <span class="info-lbl">صح وغلط</span>
+        </div>
+        <div class="info-item">
+          <span class="info-num">🔵</span>
+          <span class="info-lbl">اختيار من متعدد</span>
+        </div>
+      </div>
+
+      <button class="btn-start" onclick="startQuiz()">🚀 ابدأ الكويز دلوقتي!</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 2: QUIZ ===== -->
+  <div class="screen" id="screenQuiz">
+
+    <div class="quiz-top">
+      <div class="q-counter">سؤال <span id="qNum">1</span> من <span>16</span></div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+      <div class="score-badge">⭐ <span id="liveScore">0</span></div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="q-type-tag" id="qTypeTag"></div>
+      <div class="question-text" id="questionText"></div>
+      <div class="choices-grid" id="choicesGrid"></div>
+      <div class="feedback-box" id="feedbackBox">
+        <span class="feedback-icon" id="feedbackIcon"></span>
+        <div class="feedback-text" id="feedbackText"></div>
+      </div>
+    </div>
+
+    <button class="btn-next" id="btnNext" onclick="nextQuestion()">التالي ←</button>
+  </div>
+
+  <!-- ===== SCREEN 3: RESULT ===== -->
+  <div class="screen" id="screenResult">
+    <div class="result-card">
+      <span class="result-trophy" id="resultTrophy">🏆</span>
+      <div class="result-name">أحسنت يا <span id="resultName"></span>!</div>
+
+      <div class="score-circle" id="scoreCircle">
+        <svg viewBox="0 0 160 160" width="160" height="160">
+          <circle class="bg-circle" cx="80" cy="80" r="70"/>
+          <circle class="progress-circle" id="progressCircle" cx="80" cy="80" r="70"/>
+        </svg>
+        <div class="score-number" id="scoreNum">0</div>
+        <div class="score-label">من 16</div>
+      </div>
+
+      <div class="result-message" id="resultMessage"></div>
+
+      <div class="result-stats">
+        <div class="stat-box correct-stat">
+          <span class="stat-num" id="correctCount">0</span>
+          <span class="stat-lbl">✅ إجابة صح</span>
+        </div>
+        <div class="stat-box wrong-stat">
+          <span class="stat-num" id="wrongCount">0</span>
+          <span class="stat-lbl">❌ إجابة غلط</span>
+        </div>
+      </div>
+
+      <div id="sendingStatus" style="font-size:14px; color:var(--text-light); margin-bottom:16px; font-weight:700;">
+        ⏳ جاري إرسال نتيجتك...
+      </div>
+
+      <button class="btn-retry" onclick="retryQuiz()">🔄 حاول تاني</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== QUESTIONS DATA =====
+const questions = [
+  // TRUE / FALSE
+  {
+    type: 'tf',
+    text: 'خلق الله الإنسان على صورته ومثاله.',
+    answer: true,
+    feedback: 'صح تماماً! 🎉 الله خلق الإنسان على صورته ومثاله وميّزه عن كل المخلوقات.',
+    wrongFeedback: ''
+  },
+  {
+    type: 'tf',
+    text: 'الشجرة المحرمة التي نهى ربنا آدم عنها كانت شجرة الحياة.',
+    answer: false,
+    feedback: '',
+    wrongFeedback: 'الإجابة الصحيحة: ❌ غلط — الشجرة المحرمة كانت شجرة <span class="correct-answer">معرفة الخير والشر</span>.'
+  },
+  {
+    type: 'tf',
+    text: 'أكل آدم وحواء من الشجرة المحرمة وكسروا وصية ربنا.',
+    answer: true,
+    feedback: 'صح! 🎉 آدم وحواء أكلوا من الشجرة المحرمة وكسروا وصية ربنا.',
+    wrongFeedback: ''
+  },
+  {
+    type: 'tf',
+    text: 'بسبب الخطية طُرد آدم وحواء من الجنة.',
+    answer: true,
+    feedback: 'صح! 🎉 بسبب الخطية طُردوا من الجنة.',
+    wrongFeedback: ''
+  },
+  {
+    type: 'tf',
+    text: 'هل هذه الآية صح؟\n"أجرة الخطية هي موت"',
+    isVerse: true,
+    verseText: '"أجرة الخطية هي موت"',
+    answer: true,
+    feedback: 'صح! 🎉 هذه الآية صحيحة تماماً.',
+    wrongFeedback: ''
+  },
+  {
+    type: 'tf',
+    text: 'الحية النحاسية التي رفعها موسى كانت رمزاً للصليب.',
+    answer: true,
+    feedback: 'صح! 🎉 الحية النحاسية كانت رمزاً للصليب في العهد القديم.',
+    wrongFeedback: ''
+  },
+  {
+    type: 'tf',
+    text: 'قام الرب يسوع من الأموات في اليوم الثالث.',
+    answer: true,
+    feedback: 'صح! 🎉 ربنا يسوع قام من الأموات بقوة لاهوته في اليوم الثالث.',
+    wrongFeedback: ''
+  },
+  {
+    type: 'tf',
+    text: 'بنو إسرائيل في البرية كانوا شاكرين دائماً ولم يتذمروا على ربنا وموسى.',
+    answer: false,
+    feedback: '',
+    wrongFeedback: 'الإجابة الصحيحة: ❌ غلط — بنو إسرائيل <span class="correct-answer">كانوا يتذمرون كثيراً</span> على ربنا وعلى موسى.'
+  },
+  {
+    type: 'tf',
+    text: 'المن لونه أبيض وطعمه مثل رقاق بعسل أو قطاف بالزيت.',
+    answer: true,
+    feedback: 'صح! 🎉 المن لونه أبيض وطعمه حلو زي رقاق بعسل أو قطاف بالزيت.',
+    wrongFeedback: ''
+  },
+  {
+    type: 'tf',
+    text: 'السلوى عبارة عن طيور السمان التي تتهاجر إلى مصر.',
+    answer: true,
+    feedback: 'صح! 🎉 السلوى هي طيور السمان التي تتهاجر إلى مصر.',
+    wrongFeedback: ''
+  },
+
+  // MULTIPLE CHOICE
+  {
+    type: 'mc',
+    text: 'ما الشجرة التي نهى ربنا آدم عن الأكل منها؟',
+    choices: ['شجرة الحياة', 'شجرة معرفة الخير والشر', 'شجرة التين'],
+    answer: 1,
+    feedback: 'ممتاز! 🎉 الشجرة المحرمة كانت شجرة معرفة الخير والشر.',
+    wrongFeedback: 'الإجابة الصحيحة: <span class="correct-answer">شجرة معرفة الخير والشر</span>.'
+  },
+  {
+    type: 'mc',
+    text: 'ما عقوبة الخطية؟',
+    choices: ['المرض فقط', 'الحزن والبكاء', 'الموت'],
+    answer: 2,
+    feedback: 'ممتاز! 🎉 عقوبة الخطية هي الموت.',
+    wrongFeedback: 'الإجابة الصحيحة: <span class="correct-answer">الموت</span>.'
+  },
+  {
+    type: 'mc',
+    text: 'ماذا أرسل ربنا لبني إسرائيل في البرية ليأكلوا؟',
+    choices: ['الخبز والسمك', 'المن والسلوى', 'اللحم والفاكهة'],
+    answer: 1,
+    feedback: 'ممتاز! 🎉 ربنا أرسل لهم المن والسلوى في البرية.',
+    wrongFeedback: 'الإجابة الصحيحة: <span class="correct-answer">المن والسلوى</span>.'
+  },
+  {
+    type: 'mc',
+    text: 'ماذا أمر ربنا موسى أن يصنع ليُشفى الشعب من لدغ الحيات؟',
+    choices: ['يصلي فقط ولا يفعل شيئاً', 'يذبح ذبيحة على الجبل', 'يرفع حية نحاسية على راية'],
+    answer: 2,
+    feedback: 'ممتاز! 🎉 ربنا أمر موسى أن يرفع حية نحاسية على راية.',
+    wrongFeedback: 'الإجابة الصحيحة: <span class="correct-answer">يرفع حية نحاسية على راية</span>.'
+  },
+  {
+    type: 'mc',
+    text: 'ما هو عدد أوجه الشبه بين الصليب والحية النحاسية المذكورة في الدرس؟',
+    choices: ['اثنان فقط', 'ثلاثة', 'أربعة'],
+    answer: 2,
+    feedback: 'ممتاز! 🎉 يوجد أربعة أوجه شبه بين الصليب والحية النحاسية.',
+    wrongFeedback: 'الإجابة الصحيحة: <span class="correct-answer">أربعة</span> أوجه شبه.'
+  },
+  {
+    type: 'mc',
+    text: 'ما الذي أمر الله موسى أن يصنعه لينقذ بني إسرائيل من الحيات؟',
+    choices: ['سيفاً من ذهب', 'حية من نحاس', 'درعاً من حديد'],
+    answer: 1,
+    feedback: 'ممتاز! 🎉 الله أمر موسى أن يصنع حية من نحاس.',
+    wrongFeedback: 'الإجابة الصحيحة: <span class="correct-answer">حية من نحاس</span>.'
+  }
+];
+
+// ===== STATE =====
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let studentName = '';
+const TOTAL = questions.length;
+
+const mcLabels = ['أ', 'ب', 'ج'];
+
+// ===== START =====
+function startQuiz() {
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput.value.trim();
+  if (!name) {
+    nameInput.style.borderColor = '#EF5350';
+    nameInput.placeholder = '⚠️ من فضلك اكتب اسمك أولاً!';
+    nameInput.focus();
+    setTimeout(() => {
+      nameInput.style.borderColor = '';
+      nameInput.placeholder = 'اكتب اسمك هنا...';
+    }, 2500);
+    return;
+  }
+  studentName = name;
+  currentQ = 0;
+  score = 0;
+  showScreen('screenQuiz');
+  renderQuestion();
+}
+
+// ===== RENDER QUESTION =====
+function renderQuestion() {
+  answered = false;
+  const q = questions[currentQ];
+
+  document.getElementById('qNum').textContent = currentQ + 1;
+  document.getElementById('progressBar').style.width = ((currentQ / TOTAL) * 100) + '%';
+  document.getElementById('liveScore').textContent = score;
+
+  // Type tag
+  const tag = document.getElementById('qTypeTag');
+  if (q.type === 'tf') {
+    tag.className = 'q-type-tag tag-tf';
+    tag.textContent = '✅ صح أو غلط';
+  } else {
+    tag.className = 'q-type-tag tag-mc';
+    tag.textContent = '🔵 اختر الإجابة الصحيحة';
+  }
+
+  // Question text
+  const qText = document.getElementById('questionText');
+  if (q.isVerse) {
+    qText.innerHTML = 'هل هذه الآية صح؟<span class="verse">' + q.verseText + '</span>';
+  } else {
+    qText.textContent = q.text;
+  }
+
+  // Choices
+  const grid = document.getElementById('choicesGrid');
+  grid.innerHTML = '';
+
+  if (q.type === 'tf') {
+    grid.className = 'choices-grid tf-grid';
+    const btns = [
+      { label: '✔️ صح', val: true },
+      { label: '✖️ غلط', val: false }
+    ];
+    btns.forEach(b => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn tf-btn';
+      btn.innerHTML = '<span class="tf-emoji">' + b.label + '</span>';
+      btn.onclick = () => selectAnswer(b.val, btn);
+      grid.appendChild(btn);
+    });
+  } else {
+    grid.className = 'choices-grid';
+    q.choices.forEach((ch, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.innerHTML = '<span class="choice-icon">' + mcLabels[i] + '</span>' + ch;
+      btn.onclick = () => selectAnswer(i, btn);
+      grid.appendChild(btn);
+    });
+  }
+
+  // Reset feedback
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box';
+  document.getElementById('btnNext').className = 'btn-next';
+
+  // Animate card
+  const card = document.getElementById('questionCard');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'fadeUp 0.4s ease both';
+}
+
+// ===== SELECT ANSWER =====
+function selectAnswer(val, clickedBtn) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const allBtns = document.querySelectorAll('.choice-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const isCorrect = (q.type === 'tf') ? (val === q.answer) : (val === q.answer);
+
+  const fb = document.getElementById('feedbackBox');
+  const fbIcon = document.getElementById('feedbackIcon');
+  const fbText = document.getElementById('feedbackText');
+
+  if (isCorrect) {
+    score++;
+    document.getElementById('liveScore').textContent = score;
+    clickedBtn.classList.add('correct');
+    fb.className = 'feedback-box correct-fb show';
+    fbIcon.textContent = '🎉';
+    fbText.innerHTML = q.feedback;
+  } else {
+    clickedBtn.classList.add('wrong');
+    fb.className = 'feedback-box wrong-fb show';
+    fbIcon.textContent = '💡';
+    fbText.innerHTML = q.wrongFeedback;
+
+    // highlight correct for MC
+    if (q.type === 'mc') {
+      allBtns[q.answer].classList.add('correct');
+    } else {
+      // highlight correct TF button
+      allBtns.forEach(b => {
+        const btnVal = b.querySelector('.tf-emoji').textContent.includes('صح') ? true : false;
+        if (btnVal === q.answer) b.classList.add('correct');
+      });
+    }
+  }
+
+  const btnNext = document.getElementById('btnNext');
+  btnNext.className = 'btn-next show';
+  if (currentQ === TOTAL - 1) {
+    btnNext.textContent = '🏆 شوف نتيجتك!';
+  } else {
+    btnNext.textContent = 'التالي ←';
+  }
+}
+
+// ===== NEXT QUESTION =====
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= TOTAL) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ===== SHOW RESULT =====
+function showResult() {
+  showScreen('screenResult');
+
+  const pct = Math.round((score / TOTAL) * 100);
+
+  document.getElementById('resultName').textContent = studentName;
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('correctCount').textContent = score;
+  document.getElementById('wrongCount').textContent = TOTAL - score;
+
+  // Trophy & message
+  let trophy, msg, msgColor;
+  if (pct === 100) {
+    trophy = '🏆'; msg = '🌟 ممتاز جداً! أنت نجم الكويز!';
+    msgColor = 'background:linear-gradient(135deg,#FFD700,#FFA000); color:white;';
+  } else if (pct >= 75) {
+    trophy = '🥇'; msg = '👏 أحسنت! نتيجة رائعة!';
+    msgColor = 'background:linear-gradient(135deg,#66BB6A,#388E3C); color:white;';
+  } else if (pct >= 50) {
+    trophy = '🥈'; msg = '😊 كويس! قدر تعمل أحسن!';
+    msgColor = 'background:linear-gradient(135deg,#42A5F5,#1565C0); color:white;';
+  } else {
+    trophy = '📖'; msg = '💪 ذاكر تاني وهتبقى أحسن!';
+    msgColor = 'background:linear-gradient(135deg,#FFA726,#E65100); color:white;';
+  }
+
+  document.getElementById('resultTrophy').textContent = trophy;
+  document.getElementById('resultMessage').innerHTML = msg;
+  document.getElementById('resultMessage').style.cssText = msgColor;
+
+  // Circle progress
+  setTimeout(() => {
+    const circumference = 2 * Math.PI * 70;
+    const offset = circumference - (pct / 100) * circumference;
+    document.getElementById('progressCircle').style.strokeDashoffset = offset;
+    document.getElementById('progressCircle').style.stroke = pct >= 75 ? '#43A047' : pct >= 50 ? '#0288D1' : '#E53935';
+  }, 100);
+
+  // Confetti
+  if (pct >= 50) launchConfetti();
+
+  // Send result
+  sendResult(pct);
+}
+
+// ===== SEND RESULT =====
+function sendResult(pct) {
+  const statusEl = document.getElementById('sendingStatus');
+
+  fetch("https://formsubmit.co/ajax/arsanyh33@gmail.com", {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      "اسم الطالب": studentName,
+      "الدرس": "الدرس الأول: الصليب خطة أزلية",
+      "النتيجة": score + " من " + TOTAL,
+      "النسبة المئوية": pct + "%",
+      "_captcha": "false",
+      "_subject": "نتيجة كويز: الدرس الأول - الطالب: " + studentName
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    statusEl.style.display = 'none';
+    if (data.success === "true" || data.success === true) {
+      showPopup('🎉', 'درجتك اتسجلت بنجاح يا بطل! ⭐\nأنت مبدع يا ' + studentName + '!');
+    } else {
+      showPopup('⚠️', 'في مشكلة صغيرة في إرسال الدرجة، لكن نتيجتك ظاهرة هنا! 😊');
+    }
+  })
+  .catch(() => {
+    statusEl.style.display = 'none';
+    showPopup('⚠️', 'مش قادر يبعت النتيجة دلوقتي، لكن نتيجتك ظاهرة هنا! 😊');
+  });
+}
+
+// ===== CONFETTI =====
+function launchConfetti() {
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const colors = ['#4FC3F7','#81C784','#FFD54F','#CE93D8','#EF9A9A','#FF8A65','#80DEEA'];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left: ${Math.random() * 100}%;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      width: ${8 + Math.random() * 10}px;
+      height: ${8 + Math.random() * 10}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '3px'};
+      animation-duration: ${2 + Math.random() * 2.5}s;
+      animation-delay: ${Math.random() * 1.5}s;
+      transform: rotate(${Math.random() * 360}deg);
+    `;
+    container.appendChild(piece);
+  }
+  setTimeout(() => { container.innerHTML = ''; }, 5000);
+}
+
+// ===== POPUP =====
+function showPopup(emoji, msg) {
+  document.querySelector('.popup-emoji').textContent = emoji;
+  document.getElementById('popupMsg').textContent = msg;
+  document.getElementById('popupOverlay').className = 'popup-overlay show';
+}
+
+function closePopup() {
+  document.getElementById('popupOverlay').className = 'popup-overlay';
+}
+
+// ===== RETRY =====
+function retryQuiz() {
+  currentQ = 0;
+  score = 0;
+  document.getElementById('studentName').value = '';
+  showScreen('screenWelcome');
+}
+
+// ===== SCREEN SWITCH =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
