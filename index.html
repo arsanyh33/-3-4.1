@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>كويز الدرس الأول — الصليب خطة أزلية</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
   :root {
     --sky: #4FC3F7;
@@ -699,7 +700,6 @@
 
 <div class="confetti-container" id="confettiContainer"></div>
 
-<!-- POPUP -->
 <div class="popup-overlay" id="popupOverlay">
   <div class="popup-box">
     <span class="popup-emoji">🎉</span>
@@ -711,14 +711,12 @@
 
 <div class="page-wrapper">
 
-  <!-- HEADER -->
   <div class="site-header">
     <span class="header-cross">✝️</span>
     <div class="header-badge">مهرجان الكرازة المرقسية ٢٠٢٦ — ثالثة ورابعة ابتدائي</div>
     <h1>الدرس الأول<br><span>الصليب خطة أزلية</span></h1>
   </div>
 
-  <!-- ===== SCREEN 1: WELCOME ===== -->
   <div class="screen active" id="screenWelcome">
     <div class="welcome-card">
       <span class="welcome-icon">👋</span>
@@ -747,7 +745,6 @@
     </div>
   </div>
 
-  <!-- ===== SCREEN 2: QUIZ ===== -->
   <div class="screen" id="screenQuiz">
 
     <div class="quiz-top">
@@ -771,7 +768,6 @@
     <button class="btn-next" id="btnNext" onclick="nextQuestion()">التالي ←</button>
   </div>
 
-  <!-- ===== SCREEN 3: RESULT ===== -->
   <div class="screen" id="screenResult">
     <div class="result-card">
       <span class="result-trophy" id="resultTrophy">🏆</span>
@@ -825,7 +821,7 @@ const questions = [
     text: 'الشجرة المحرمة التي نهى ربنا آدم عنها كانت شجرة الحياة.',
     answer: false,
     feedback: '',
-    wrongFeedback: 'الإجابة الصحيحة: ❌ غلط — الشجرة المحرمة كانت شجرة <span class="correct-answer">معرفة الخير والشر</span>.'
+    wrongFeedback: 'الإجابة الصحيحة: ❌ غلط — شجرة المحرمة كانت شجرة <span class="correct-answer">معرفة الخير والشر</span>.'
   },
   {
     type: 'tf',
@@ -1139,38 +1135,33 @@ function showResult() {
   sendResult(pct);
 }
 
-// ===== SEND RESULT =====
-function sendResult(pct) {
-  const statusEl = document.getElementById('sendingStatus');
+// ===== EMAILJS INIT =====
+(function() {
+  emailjs.init({ publicKey: "yxg4S4XsBSmgD5c0E" });
+})();
 
-  fetch("https://formsubmit.co/ajax/arsanyh33@gmail.com", {
-    method: "POST",
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify({
-      "اسم الطالب": studentName,
-      "الدرس": "الدرس الأول: الصليب خطة أزلية",
-      "النتيجة": score + " من " + TOTAL,
-      "النسبة المئوية": pct + "%",
-      "_captcha": "false",
-      "_subject": "نتيجة كويز: الدرس الأول - الطالب: " + studentName
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    statusEl.style.display = 'none';
-    if (data.success === "true" || data.success === true) {
-      showPopup('🎉', 'درجتك اتسجلت بنجاح يا بطل! ⭐\nأنت مبدع يا ' + studentName + '!');
-    } else {
-      showPopup('⚠️', 'في مشكلة صغيرة في إرسال الدرجة، لكن نتيجتك ظاهرة هنا! 😊');
-    }
-  })
-  .catch(() => {
-    statusEl.style.display = 'none';
-    showPopup('⚠️', 'مش قادر يبعت النتيجة دلوقتي، لكن نتيجتك ظاهرة هنا! 😊');
-  });
+// ===== SEND RESULT VIA EMAILJS =====
+function sendQuizResult(sName, sScore, sTotal) {
+  var templateParams = {
+    student_name: sName,
+    lesson_name: "الدرس الأول: الصليب خطة أزلية",
+    student_score: sScore + " من " + sTotal
+  };
+
+  emailjs.send('service_onlhg4s', 't7t10ro', templateParams)
+    .then(function(response) {
+      console.log('SUCCESS!', response.status, response.text);
+      showPopup('🎉', 'درجتك اتسجلت بنجاح يا بطل! ⭐\nأنت مبدع يا ' + sName + '!');
+    }, function(error) {
+      console.error('FAILED...', error);
+    });
+}
+
+function sendResult(pct) {
+  var statusEl = document.getElementById('sendingStatus');
+  if(statusEl) statusEl.style.display = 'none';
+  // هنا تم تصحيح أسماء المتغيرات لتطابق المعرفة فوق (score و TOTAL)
+  sendQuizResult(studentName, score, TOTAL);
 }
 
 // ===== CONFETTI =====
